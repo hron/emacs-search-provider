@@ -3,19 +3,12 @@ import Gio from "gi://Gio";
 import Shell from "gi://Shell";
 import { Extension } from "resource:///org/gnome/shell/extensions/extension.js";
 import { AppSearchProvider } from "resource:///org/gnome/shell/ui/appDisplay.js";
-import { fileExists, readFile, uniqueId } from "./util.js";
+import { fileExists, readFile } from "./util.js";
 
-interface VSStorage {
-  profileAssociations: {
-    workspaces: Record<string, string>;
-  };
-}
-
-export default class VSCodeSearchProvider<
-  T extends Extension & { _settings: Gio.Settings | null },
-> implements AppSearchProvider
+export default class EmacsSearchProvider<T extends Extension>
+  implements AppSearchProvider
 {
-  workspaces: Record<string, { name: string; path: string }> = {};
+  projects: string[] = [];
   extension: T;
   app: Shell.App | null = null;
   appInfo: Gio.DesktopAppInfo | undefined;
@@ -28,118 +21,55 @@ export default class VSCodeSearchProvider<
   }
 
   _loadWorkspaces() {
-    const codeConfig = this._getConfig();
-    if (!codeConfig) {
-      console.error("Failed to read vscode storage.json");
+    const projectList = this._getProjectList();
+    if (!projectList) {
+      logError("Failed to read Emacs `projects` file");
       return;
     }
 
-    const paths = Object.keys(codeConfig.profileAssociations.workspaces).sort();
-
-    this.workspaces = {};
-    for (const path of paths.map(decodeURIComponent)) {
-      if (path.startsWith("vscode-remote://dev-container")) {
-        continue;
-      }
-      const name = path.split("/").pop()!;
-      this.workspaces[uniqueId()] = {
-        name: name.replace(".code-workspace", " Workspace"),
-        path: path.replace("file://", ""),
-      };
-    }
+    this.projects = projectList;
   }
 
-  _getConfig(): VSStorage | undefined {
-    const configDirs = [
-      Glib.get_user_config_dir(),
-      `${Glib.get_home_dir()}/.var/app`,
+  _getProjectList(): string[] | undefined {
+    const possibleLocations = [
+      // Doom Emacs
+      `${Glib.get_home_dir()}/.emacs.d/.local/state/projects`,
     ];
 
-    const appDirs = [
-      // XDG_CONFIG_DIRS
-      "Code",
-      "Code - Insiders",
-      "VSCodium",
-      "VSCodium - Insiders",
+    for (const projectsPath of possibleLocations) {
+      if (!fileExists(projectsPath)) {
+        continue;
+      }
 
-      // Flatpak
-      "com.vscodium.codium/config/VSCodium",
-      "com.vscodium.codium-insiders/config/VSCodium - Insiders",
-    ];
+      const projectsLispData = readFile(projectsPath);
 
-    for (const configDir of configDirs) {
-      for (const appDir of appDirs) {
-        const path = `${configDir}/${appDir}/User/globalStorage/storage.json`;
-        if (!fileExists(path)) {
-          continue;
-        }
-
-        const storage = readFile(path);
-
-        if (storage) {
-          return JSON.parse(storage);
-        }
+      if (projectsLispData) {
+        return projectsLispData
+          .replace(/;.*\n/g, "")
+          .split(/\s*\(*"|"\)*\s*/)
+          .filter((s) => !s.match(/^[()\s]*$/));
       }
     }
   }
 
   _findApp() {
-    const ids = [
-      "code",
-      "code-insiders",
-      "code-oss",
-      "codium",
-      "codium-insiders",
-      "com.vscodium.codium",
-      "com.vscodium.codium-insiders",
-    ];
-
-    for (let i = 0; !this.app && i < ids.length; i++) {
-      this.app = Shell.AppSystem.get_default().lookup_app(ids[i] + ".desktop");
-    }
-
+    this.app = Shell.AppSystem.get_default().lookup_app("emacs.desktop");
     if (!this.app) {
-      console.error("Failed to find vscode application");
+      logError("Failed to find Emacs application");
     }
   }
 
-  activateResult(result: string): void {
+  activateResult(path: string): void {
     if (this.app) {
-      const path = this.workspaces[result].path;
-      if (
-        path.startsWith("vscode-remote://") ||
-        path.startsWith("vscode-vfs://")
-      ) {
-        const lastSegment = path.split("/").pop();
-        const type = lastSegment?.slice(1)?.includes(".") ? "file" : "folder";
-
-        const command =
-          this.app?.app_info.get_executable() + " --" + type + "-uri " + path;
-        Glib.spawn_command_line_async(command);
-      } else {
-        this.app?.app_info.launch([Gio.file_new_for_path(path)], null);
+      try {
+        Gio.Subprocess.new(
+          [this.app?.app_info.get_executable(), "--chdir", path],
+          Gio.SubprocessFlags.NONE,
+        );
+      } catch (e) {
+        logError(e);
       }
     }
-  }
-
-  _customSuffix(path: string) {
-    if (!this.extension?._settings?.get_boolean("suffix")) {
-      return "";
-    }
-
-    const prefixes = {
-      "vscode-remote://codespaces": "[Codespaces]",
-      "vscode-remote://": "[Remote]",
-      "vscode-vfs://github": "[Github]",
-    };
-
-    for (const prefix of Object.keys(prefixes)) {
-      if (path.startsWith(prefix)) {
-        return " " + prefixes[prefix as keyof typeof prefixes];
-      }
-    }
-
-    return "";
   }
 
   filterResults(results: string[], maxResults: number) {
@@ -149,24 +79,27 @@ export default class VSCodeSearchProvider<
   async getInitialResultSet(terms: string[]) {
     this._loadWorkspaces();
     const searchTerm = terms.join("").toLowerCase();
-    return Object.keys(this.workspaces).filter((id) =>
-      this.workspaces[id].name.toLowerCase().includes(searchTerm),
+    return this.projects.filter((path) =>
+      path.toLowerCase().includes(searchTerm),
     );
   }
 
   async getSubsearchResultSet(previousResults: string[], terms: string[]) {
     const searchTerm = terms.join("").toLowerCase();
-    return previousResults.filter((id) =>
-      this.workspaces[id].name.toLowerCase().includes(searchTerm),
+    return previousResults.filter((path) =>
+      path.toLowerCase().includes(searchTerm),
     );
   }
 
-  async getResultMetas(ids: string[]) {
-    return ids.map((id) => ({
-      id,
+  async getResultMetas(projects: string[]) {
+    return projects.map((project) => ({
+      id: project,
       name:
-        this.workspaces[id].name + this._customSuffix(this.workspaces[id].path),
-      description: this.workspaces[id].path,
+        project
+          .split("/")
+          .filter((p) => p)
+          .at(-1) || project,
+      description: project,
       createIcon: (size: number) => this.app?.create_icon_texture(size),
     }));
   }

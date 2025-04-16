@@ -21,6 +21,6 @@ export default {
     return true;
   },
   file_get_contents() {
-    return [true, readFileSync("tests/fixtures/storage.json")];
+    return [true, readFileSync("tests/fixtures/projects")];
   },
 };
