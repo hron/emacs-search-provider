@@ -36,6 +36,10 @@ export default class EmacsSearchProvider<T extends Extension>
       `${Glib.get_home_dir()}/.emacs.d/.local/cache/projectile/projects.eld`,
       // Doom Emacs - project.el
       `${Glib.get_home_dir()}/.emacs.d/.local/state/projects`,
+      // Default for projectile
+      `${Glib.get_home_dir()}/.emacs.d/.local/cache/projectile-bookmarks.eld`,
+      // Default for project.el
+      `${Glib.get_home_dir()}/.emacs.d/.local/cache/projects`,
     ];
 
     for (const projectsPath of possibleLocations) {
