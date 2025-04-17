@@ -16,11 +16,11 @@ export default class EmacsSearchProvider<T extends Extension>
   constructor(extension: T) {
     this.extension = extension;
     this._findApp();
-    this._loadWorkspaces();
+    this._loadProjects();
     this.appInfo = this.app?.appInfo;
   }
 
-  _loadWorkspaces() {
+  _loadProjects() {
     const projectList = this._getProjectList();
     if (!projectList) {
       logError("Failed to read Emacs `projects` file");
@@ -49,7 +49,8 @@ export default class EmacsSearchProvider<T extends Extension>
         return projectsLispData
           .replace(/;.*\n/g, "")
           .split(/\s*\(*"|"\)*\s*/)
-          .filter((s) => !s.match(/^[()\s]*$/));
+          .filter((s) => !s.match(/^[()\s]*$/))
+          .map((s) => s.replace(new RegExp(`^${Glib.get_home_dir()}`), "~"));
       }
     }
   }
@@ -64,8 +65,9 @@ export default class EmacsSearchProvider<T extends Extension>
   activateResult(path: string): void {
     if (this.app) {
       try {
+        const fullPath = path.replace(/^~/, Glib.get_home_dir());
         Gio.Subprocess.new(
-          [this.app?.app_info.get_executable(), "--chdir", path],
+          [this.app?.app_info.get_executable(), "--chdir", fullPath],
           Gio.SubprocessFlags.NONE,
         );
       } catch (e) {
@@ -79,11 +81,8 @@ export default class EmacsSearchProvider<T extends Extension>
   }
 
   async getInitialResultSet(terms: string[]) {
-    this._loadWorkspaces();
-    const searchTerm = terms.join("").toLowerCase();
-    return this.projects.filter((path) =>
-      path.toLowerCase().includes(searchTerm),
-    );
+    this._loadProjects();
+    return this.getSubsearchResultSet(this.projects, terms);
   }
 
   async getSubsearchResultSet(previousResults: string[], terms: string[]) {

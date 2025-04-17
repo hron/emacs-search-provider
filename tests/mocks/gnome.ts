@@ -15,7 +15,9 @@ export default {
     },
   },
   get_user_config_dir() {},
-  get_home_dir() {},
+  get_home_dir() {
+    return "/home/john";
+  },
   FileTest,
   file_test() {
     return true;

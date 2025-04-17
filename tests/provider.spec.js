@@ -31,9 +31,9 @@ test("should read projects in projectile format", () => {
 test("should read projects in project.el format", () => {
   const provider = new Provider();
   assert.equal(provider.projects, [
-    "/home/john/src/emacs-search-provider/",
-    "/home/john/src/dotfiles/",
-    "/home/john/src/linux/",
+    "~/src/emacs-search-provider/",
+    "~/src/dotfiles/",
+    "~/src/linux/",
   ]);
 });
 
