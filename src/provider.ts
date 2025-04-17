@@ -32,7 +32,9 @@ export default class EmacsSearchProvider<T extends Extension>
 
   _getProjectList(): string[] | undefined {
     const possibleLocations = [
-      // Doom Emacs
+      // Doom Emacs - projectile
+      `${Glib.get_home_dir()}/.emacs.d/.local/cache/projectile/projects.eld`,
+      // Doom Emacs - project.el
       `${Glib.get_home_dir()}/.emacs.d/.local/state/projects`,
     ];
 
