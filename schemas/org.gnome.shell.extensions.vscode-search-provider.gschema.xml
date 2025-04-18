@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="org.gnome.shell.extensions.emacs-search-provider" path="/org/gnome/shell/extensions/emacs-search-provider/">
+    <key name="projects-path" type="s">
+      <default>""</default>
+      <summary>`projects` file location. It could be in `project.el` or `projectile` format</summary>
+    </key>
+  </schema>
+</schemalist>

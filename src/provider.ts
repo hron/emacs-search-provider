@@ -5,8 +5,9 @@ import { Extension } from "resource:///org/gnome/shell/extensions/extension.js";
 import { AppSearchProvider } from "resource:///org/gnome/shell/ui/appDisplay.js";
 import { fileExists, readFile } from "./util.js";
 
-export default class EmacsSearchProvider<T extends Extension>
-  implements AppSearchProvider
+export default class EmacsSearchProvider<
+  T extends Extension & { _settings: Gio.Settings | null },
+> implements AppSearchProvider
 {
   projects: string[] = [];
   extension: T;
@@ -23,7 +24,7 @@ export default class EmacsSearchProvider<T extends Extension>
   _loadProjects() {
     const projectList = this._getProjectList();
     if (!projectList) {
-      logError("Failed to read Emacs `projects` file");
+      log("Failed to read Emacs `projects` file");
       return;
     }
 
@@ -32,6 +33,7 @@ export default class EmacsSearchProvider<T extends Extension>
 
   _getProjectList(): string[] | undefined {
     const possibleLocations = [
+      this._projectsPathFromSettings(),
       // Doom Emacs - projectile
       `${Glib.get_home_dir()}/.emacs.d/.local/cache/projectile/projects.eld`,
       // Doom Emacs - project.el
@@ -43,7 +45,7 @@ export default class EmacsSearchProvider<T extends Extension>
     ];
 
     for (const projectsPath of possibleLocations) {
-      if (!fileExists(projectsPath)) {
+      if (!projectsPath || !fileExists(projectsPath)) {
         continue;
       }
 
@@ -62,14 +64,14 @@ export default class EmacsSearchProvider<T extends Extension>
   _findApp() {
     this.app = Shell.AppSystem.get_default().lookup_app("emacs.desktop");
     if (!this.app) {
-      logError("Failed to find Emacs application");
+      print("Failed to find Emacs application");
     }
   }
 
   activateResult(path: string): void {
     if (this.app) {
       try {
-        const fullPath = path.replace(/^~/, Glib.get_home_dir());
+        const fullPath = this._resolveHomePath(path);
         Gio.Subprocess.new(
           [this.app?.app_info.get_executable(), "--chdir", fullPath],
           Gio.SubprocessFlags.NONE,
@@ -78,6 +80,14 @@ export default class EmacsSearchProvider<T extends Extension>
         logError(e);
       }
     }
+  }
+
+  _projectsPathFromSettings(): string | undefined {
+    return this.extension?._settings?.get_string("projects-path");
+  }
+
+  _resolveHomePath(path: string): string {
+    return path.replace(/^~/, Glib.get_home_dir());
   }
 
   filterResults(results: string[], maxResults: number) {
