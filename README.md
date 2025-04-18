@@ -1,6 +1,6 @@
 # Emacs Search Provider
 
-![GitHub License](https://img.shields.io/github/license/hron/emacs-search-provider) [![Lint](https://github.com/hron/emacs-search-provider/actions/workflows/eslint.yml/badge.svg)](https://github.com/hron/emacs-search-provider/actions/workflows/eslint.yml) ![GNOME Extensions download](https://img.shields.io/badge/dynamic/xml?url=https%3A%2F%2Fextensions.gnome.org%2Fextension%2F6976%2emacs-search-provider%2F&query=%2Fhtml%2Fbody%2Fdiv%5B2%5D%2Fdiv%5Fdiv%5B2%5D%2Fdiv%5B1%5D%2Fspan%5B3%5D&logo=gnome&label=GNOME%20extensions&cacheSeconds=86400)
+![GitHub License](https://img.shields.io/github/license/hron/emacs-search-provider) [![Lint](https://github.com/hron/emacs-search-provider/actions/workflows/eslint.yml/badge.svg)](https://github.com/hron/emacs-search-provider/actions/workflows/eslint.yml) ![GNOME Extensions download](https://img.shields.io/badge/dynamic/xml?url=https%3A%2F%2Fextensions.gnome.org%2Fextension%2F8064/%2emacs-search-provider%2F&query=%2Fhtml%2Fbody%2Fdiv%5B2%5D%2Fdiv%5Fdiv%5B2%5D%2Fdiv%5B1%5D%2Fspan%5B3%5D&logo=gnome&label=GNOME%20extensions&cacheSeconds=86400)
 
 ## Description
 
@@ -18,7 +18,7 @@ The Emacs Search Provider Extension is a GNOME Shell extension that facilitates 
 
 ### Installing via Gnome Extensions
 
-<!-- [<img alt="" height="100" src="https://raw.githubusercontent.com/andyholmes/gnome-shell-extensions-badge/master/get-it-on-ego.svg?sanitize=true">](https://extensions.gnome.org/extension/6976/) -->
+[<img alt="" height="100" src="https://raw.githubusercontent.com/andyholmes/gnome-shell-extensions-badge/master/get-it-on-ego.svg?sanitize=true">](https://extensions.gnome.org/extension/8064//)
 
 ### Installing from the GitHub Repository
 
