@@ -24,7 +24,7 @@ export default class EmacsSearchProvider<
   _loadProjects() {
     const projectList = this._getProjectList();
     if (!projectList) {
-      log("Failed to read Emacs `projects` file");
+      console.error("Failed to read Emacs `projects` file");
       return;
     }
 
@@ -64,7 +64,7 @@ export default class EmacsSearchProvider<
   _findApp() {
     this.app = Shell.AppSystem.get_default().lookup_app("emacs.desktop");
     if (!this.app) {
-      print("Failed to find Emacs application");
+      console.error("Failed to find Emacs application");
     }
   }
 
@@ -77,7 +77,7 @@ export default class EmacsSearchProvider<
           Gio.SubprocessFlags.NONE,
         );
       } catch (e) {
-        logError(e);
+        console.error(e);
       }
     }
   }
