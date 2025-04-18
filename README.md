@@ -46,7 +46,7 @@ With the introduction of `project.el` in Emacs, a standard approach to project m
 To start Emacs, this extension executes `emacs --chdir <projectPath>`. It is assumed that Emacs is configured to restore project-specific settings from the current directory. Flexibility is a hallmark of Emacs, and one configuration could involve using the built-in `desktop.el`. Here is an example configuration:
 
 ```emacs-lisp
-(use-package! emacs
+(use-package emacs
   :init
   (desktop-save-mode +1)
   :custom
