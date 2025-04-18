@@ -1,0 +1,4 @@
+;;; -*- lisp-data -*-
+(("/home/john/src/emacs-search-provider/") ("/home/john/src/dotfiles/") ; other comment
+ ;; some other comment
+ ("/home/john/src/linux/"))

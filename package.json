@@ -1,22 +1,22 @@
 {
-  "name": "vscode-search-provider",
-  "version": "2.3.0",
-  "description": "Provide search results from vscode",
+  "name": "emacs-search-provider",
+  "version": "0.0.1",
+  "description": "Provide search results from Emacs",
   "type": "module",
   "private": true,
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mrmarble/vscode-search-provider.git"
+    "url": "git+https://github.com/hron/emacs-search-provider.git"
   },
-  "author": "Alvaro Tinoco <contact@mrmarble.dev>",
+  "author": "Aleksei Gusev <aleksei.gusev@gmail.com>",
   "license": "LGPL-3.0-or-later",
   "bugs": {
-    "url": "https://github.com/mrmarble/vscode-search-provider/issues"
+    "url": "https://github.com/hron/emacs-search-provider/issues"
   },
-  "homepage": "https://github.com/mrmarble/vscode-search-provider#readme",
+  "homepage": "https://github.com/hron/emacs-search-provider#readme",
   "sideEffects": false,
   "config": {
-    "domain": "mrmarble.github.com"
+    "domain": "hron.github.com"
   },
   "scripts": {
     "build": "tsc",
@@ -26,7 +26,7 @@
     "format:fix": "prettier --write .",
     "clean": "rm -rf dist && rm -f ${npm_package_name}.zip",
     "pack": "npm run clean && npm run build && cp metadata.json dist && cp -r schemas dist && cd dist && zip ../${npm_package_name}.zip -9r .",
-    "install-extension": "touch $XDG_CONFIG_HOME/local/share/gnome-shell/extensions/${npm_package_name}@${npm_package_config_domain} && rm -rf $XDG_CONFIG_HOME/local/share/gnome-shell/extensions/${npm_package_name}@${npm_package_config_domain} && mv dist $XDG_CONFIG_HOME/local/share/gnome-shell/extensions/${npm_package_name}@${npm_package_config_domain}",
+    "install-extension": "touch $XDG_DATA_HOME/gnome-shell/extensions/${npm_package_name}@${npm_package_config_domain} && rm -rf $XDG_DATA_HOME/gnome-shell/extensions/${npm_package_name}@${npm_package_config_domain} && mv dist $XDG_DATA_HOME/gnome-shell/extensions/${npm_package_name}@${npm_package_config_domain}",
     "setup": "npm run pack && glib-compile-schemas ./dist/schemas && npm run install-extension",
     "debug": "dbus-run-session -- gnome-shell --nested --wayland",
     "prepare": "simple-git-hooks",

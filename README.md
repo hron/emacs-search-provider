@@ -1,46 +1,64 @@
-# VSCode Search Provider
+# Emacs Search Provider
 
-![GitHub License](https://img.shields.io/github/license/mrmarble/vscode-search-provider)
-[![Lint](https://github.com/MrMarble/vscode-search-provider/actions/workflows/eslint.yml/badge.svg)](https://github.com/MrMarble/vscode-search-provider/actions/workflows/eslint.yml)
-![GNOME Extensions download](https://img.shields.io/badge/dynamic/xml?url=https%3A%2F%2Fextensions.gnome.org%2Fextension%2F6976%2Fvscode-search-provider%2F&query=%2Fhtml%2Fbody%2Fdiv%5B2%5D%2Fdiv%2Fdiv%5B2%5D%2Fdiv%5B1%5D%2Fspan%5B3%5D&logo=gnome&label=GNOME%20extensions&cacheSeconds=86400)
+![GitHub License](https://img.shields.io/github/license/hron/emacs-search-provider) [![Lint](https://github.com/hron/emacs-search-provider/actions/workflows/eslint.yml/badge.svg)](https://github.com/hron/emacs-search-provider/actions/workflows/eslint.yml) ![GNOME Extensions download](https://img.shields.io/badge/dynamic/xml?url=https%3A%2F%2Fextensions.gnome.org%2Fextension%2F6976%2emacs-search-provider%2F&query=%2Fhtml%2Fbody%2Fdiv%5B2%5D%2Fdiv%5Fdiv%5B2%5D%2Fdiv%5B1%5D%2Fspan%5B3%5D&logo=gnome&label=GNOME%20extensions&cacheSeconds=86400)
 
 ## Description
 
-![screenshot.png](screenshot.png)
+![Screenshot](screenshot.png)
 
-VSCode Search Provider Extension is a Gnome Shell Extension that integrates Visual Studio Code's search functionality into the Gnome Shell.
+The Emacs Search Provider Extension is a GNOME Shell extension that facilitates the launching of Emacs within a specified project directory.
 
 ## Features
 
-- Supports GNOME Shell 45 - 46 (and possibly newer versions)
-- List all your local VSCode workspaces
-- List all your remote VSCode projects
+- Compatible with GNOME Shell versions 45 to 46, and potentially later releases.
+- Compiles a list of Emacs projects managed via the built-in `project.el`
+- Compiles a list of Emacs projects managed via `projectile`
 
 ## Installation
 
-### Installation from Gnome Extensions
+### Installing via Gnome Extensions
 
-[<img alt="" height="100" src="https://raw.githubusercontent.com/andyholmes/gnome-shell-extensions-badge/master/get-it-on-ego.svg?sanitize=true">](https://extensions.gnome.org/extension/6976/)
+<!-- [<img alt="" height="100" src="https://raw.githubusercontent.com/andyholmes/gnome-shell-extensions-badge/master/get-it-on-ego.svg?sanitize=true">](https://extensions.gnome.org/extension/6976/) -->
 
-### Installation from GitHub repository
+### Installing from the GitHub Repository
 
-The latest development version
-You may need to install `git` and `node`
-Navigate to the directory you want to download the source code and execute following commands in the terminal:
+For the latest development version, you may need to ensure `git` and `node` are installed first. Proceed to the directory where you wish to download the source code and execute the following commands:
 
-#### GNOME 45+
+#### For GNOME 45+
 
-    git clone https://github.com/MrMarble/vscode-search-provider.git
-    cd vscode-search-provider
+    git clone https://github.com/hron/emacs-search-provider.git
+    cd emacs-search-provider
     npm install && npm run setup
 
-### Enabling the extension
+### Activating the Extension
 
-After installation you need to enable the extension.
+Following installation, the extension must be enabled.
 
-- First restart GNOME Shell (`ALt` + `F2`, `r`, `Enter`, or Log-Out/Log-In if you use Wayland)
-- Now you should see the _VSCode Search Provider_ extension in the _Extensions_ application (reopen the app if needed to load new data), where you can enable it.
+- Restart GNOME Shell (`Alt` + `F2`, `r`, `Enter`, or Log-Out/Log-In if operating on Wayland)
+- The _Emacs Search Provider_ extension should now appear in the _Extensions_ application. If not visible, reopen the application to refresh the data, and you can then enable it.
 
-### Contributing
+## Functionality
 
-If you'd like to contribute, please fork the repository and use a feature branch. Pull requests are warmly welcome.
+With the introduction of `project.el` in Emacs, a standard approach to project management is possible, yet `projectile` remains popular. For this reason, the extension supports both. It performs searches and parses `projects`/`projects.eld` in standard locations, although custom paths can be configured within the settings:
+
+![Settings Screenshot](settings-screenshot.png)
+
+To start Emacs, this extension executes `emacs --chdir <projectPath>`. It is assumed that Emacs is configured to restore project-specific settings from the current directory. Flexibility is a hallmark of Emacs, and one configuration could involve using the built-in `desktop.el`. Here is an example configuration:
+
+```emacs-lisp
+(use-package! emacs
+  :init
+  (desktop-save-mode +1)
+  :custom
+  (desktop-path (list ".")))
+```
+
+With this setup, Emacs attempts to load the `.emacs.desktop` file from the project root, restoring buffers, windows, and frame configurations akin to Visual Studio Code.
+
+## Contribution
+
+If you are interested in contributing, kindly fork the repository and create a feature branch. Pull requests are highly appreciated.
+
+### Acknowledgements
+
+This extension is significantly influenced by the outstanding work of [@MrMarble](https://github.com/MrMarble) and the contributors at [vscode-search-provider](https://github.com/MrMarble/vscode-search-provider/). We extend our gratitude to all of them.
