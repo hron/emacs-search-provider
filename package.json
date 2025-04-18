@@ -33,7 +33,9 @@
     "test": "node --loader ./tests/mocks/loader.js --loader tsm node_modules/.bin/uvu ./tests \\.spec\\.js$"
   },
   "release": {
-    "branches": ["main"]
+    "branches": [
+      "main"
+    ]
   },
   "simple-git-hooks": {
     "pre-commit": "npx lint-staged",
