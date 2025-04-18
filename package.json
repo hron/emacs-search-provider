@@ -1,6 +1,6 @@
 {
   "name": "emacs-search-provider",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Provide search results from Emacs",
   "type": "module",
   "private": true,
@@ -33,9 +33,7 @@
     "test": "node --loader ./tests/mocks/loader.js --loader tsm node_modules/.bin/uvu ./tests \\.spec\\.js$"
   },
   "release": {
-    "branches": [
-      "main"
-    ]
+    "branches": ["main"]
   },
   "simple-git-hooks": {
     "pre-commit": "npx lint-staged",
