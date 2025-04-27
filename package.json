@@ -1,6 +1,6 @@
 {
   "name": "emacs-search-provider",
-  "version": "0.0.2",
+  "version": "3",
   "description": "Provide search results from Emacs",
   "type": "module",
   "private": true,
