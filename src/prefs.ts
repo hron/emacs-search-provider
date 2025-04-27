@@ -34,44 +34,23 @@ export default class Preferences extends ExtensionPreferences {
   }
 
   private setupEmacsExecRow(window: Window, group: Adw.PreferencesGroup) {
-    const defaultValue = "emacs --chdir %D";
     const settingName = "emacs-exec";
 
-    const row = new Adw.ActionRow({
-      title: _("Emacs command to run for a project"),
-      subtitle:
-        "Emacs command to use when activating a project. %D is replaced with project's directory",
+    const row = new Adw.EntryRow({
+      title: _(
+        "Emacs command to run for a project (default: emacs --chdir %D)",
+      ),
+      text: window._settings!.get_string(settingName),
     });
     group.add(row);
 
-    const entry = new Gtk.Entry({
-      text: window._settings!.get_string(settingName),
-      halign: Gtk.Align.END,
-      valign: Gtk.Align.CENTER,
-    });
     let timeoutId: number | NodeJS.Timeout | undefined;
-    entry.connect("changed", (widget) => {
+    row.connect("changed", (widget) => {
       clearTimeout(timeoutId);
       timeoutId = setTimeout(() => {
         window._settings!.set_string(settingName, widget.get_text());
       }, 1000);
     });
-    row.add_suffix(entry);
-    row.activatableWidget = entry;
-
-    const resetButton = new Gtk.Button({
-      halign: Gtk.Align.END,
-      valign: Gtk.Align.CENTER,
-      hexpand: false,
-      vexpand: false,
-      iconName: "edit-undo-symbolic",
-      sensitive: true,
-    });
-    resetButton.connect("clicked", () => {
-      window._settings!.set_string(settingName, defaultValue);
-      entry.set_text(defaultValue);
-    });
-    row.add_suffix(resetButton);
   }
 
   private setupProjectsFileRow(window: Window, group: Adw.PreferencesGroup) {
