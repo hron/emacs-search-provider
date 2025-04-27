@@ -74,8 +74,8 @@ export default class EmacsSearchProvider<
         const fullPath = this._resolveHomePath(path);
         const commandTemplate =
           this.extension?._settings?.get_string("emacs-exec") ||
-          "emacs --chdir %D";
-        const command = commandTemplate.replaceAll("%D", fullPath);
+          "emacs --chdir %PROJECT_DIR%";
+        const command = commandTemplate.replaceAll("%PROJECT_DIR%", fullPath);
         const argv = ["sh", "-c", command];
         Gio.Subprocess.new(argv, Gio.SubprocessFlags.NONE);
       } catch (e) {

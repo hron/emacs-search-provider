@@ -38,7 +38,7 @@ export default class Preferences extends ExtensionPreferences {
 
     const row = new Adw.EntryRow({
       title: _(
-        "Emacs command to run for a project (default: emacs --chdir %D)",
+        "Emacs command to run for a project (default: emacs --chdir %PROJECT_DIR%)",
       ),
       text: window._settings!.get_string(settingName),
     });
