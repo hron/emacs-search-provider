@@ -5,5 +5,9 @@
       <default>""</default>
       <summary>`projects` file location. It could be in `project.el` or `projectile` format</summary>
     </key>
+    <key name="emacs-exec" type="s">
+      <default>"emacs --chdir %D"</default>
+      <summary>Emacs command to run for a project</summary>
+    </key>
   </schema>
 </schemalist>

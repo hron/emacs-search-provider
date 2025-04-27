@@ -17,7 +17,6 @@ export default class Preferences extends ExtensionPreferences {
   fillPreferencesWindow(window: Window) {
     window._settings = this.getSettings();
 
-    // Create a preferences page, with a single group
     const page = new Adw.PreferencesPage({
       title: _("General"),
       icon_name: "dialog-information-symbolic",
@@ -30,25 +29,70 @@ export default class Preferences extends ExtensionPreferences {
     });
     page.add(group);
 
-    // Create a new preferences row with a button
-    const buttonRow = new Adw.ActionRow({
+    this.setupProjectsFileRow(window, group);
+    this.setupEmacsExecRow(window, group);
+  }
+
+  private setupEmacsExecRow(window: Window, group: Adw.PreferencesGroup) {
+    const defaultValue = "emacs --chdir %D";
+    const settingName = "emacs-exec";
+
+    const row = new Adw.ActionRow({
+      title: _("Emacs command to run for a project"),
+      subtitle:
+        "Emacs command to use when activating a project. %D is replaced with project's directory",
+    });
+    group.add(row);
+
+    const entry = new Gtk.Entry({
+      text: window._settings!.get_string(settingName),
+      halign: Gtk.Align.END,
+      valign: Gtk.Align.CENTER,
+    });
+    let timeoutId: number | NodeJS.Timeout | undefined;
+    entry.connect("changed", (widget) => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        window._settings!.set_string(settingName, widget.get_text());
+      }, 1000);
+    });
+    row.add_suffix(entry);
+    row.activatableWidget = entry;
+
+    const resetButton = new Gtk.Button({
+      halign: Gtk.Align.END,
+      valign: Gtk.Align.CENTER,
+      hexpand: false,
+      vexpand: false,
+      iconName: "edit-undo-symbolic",
+      sensitive: true,
+    });
+    resetButton.connect("clicked", () => {
+      window._settings!.set_string(settingName, defaultValue);
+      entry.set_text(defaultValue);
+    });
+    row.add_suffix(resetButton);
+  }
+
+  private setupProjectsFileRow(window: Window, group: Adw.PreferencesGroup) {
+    const projectsFileRow = new Adw.ActionRow({
       title: _("`projects` file location"),
       subtitleLines: 2,
-      subtitle: this._generateSubtitle(
-        window._settings.get_string("projects-path"),
+      subtitle: this.subtitleForProjectsFile(
+        window._settings!.get_string("projects-path"),
       ),
     });
-    group.add(buttonRow);
+    group.add(projectsFileRow);
 
     const clearButton = new Gtk.Button({
       label: _("Clear"),
       valign: Gtk.Align.CENTER,
       halign: Gtk.Align.CENTER,
     });
-    buttonRow.add_suffix(clearButton);
+    projectsFileRow.add_suffix(clearButton);
     clearButton.connect("clicked", () => {
       window._settings!.set_string("projects-path", "");
-      buttonRow.set_subtitle(this._generateSubtitle(""));
+      projectsFileRow.set_subtitle(this.subtitleForProjectsFile(""));
     });
 
     const selectButton = new Gtk.Button({
@@ -56,7 +100,7 @@ export default class Preferences extends ExtensionPreferences {
       valign: Gtk.Align.CENTER,
       halign: Gtk.Align.CENTER,
     });
-    buttonRow.add_suffix(selectButton);
+    projectsFileRow.add_suffix(selectButton);
     const projectsFileChooser = new Gtk.FileDialog({
       accept_label: "Select",
       modal: true,
@@ -67,12 +111,12 @@ export default class Preferences extends ExtensionPreferences {
       projectsFileChooser.open(window, null, (self, res) => {
         const filePath = self.open_finish(res).get_uri().replace("file://", "");
         window._settings!.set_string("projects-path", filePath);
-        buttonRow.set_subtitle(this._generateSubtitle(filePath));
+        projectsFileRow.set_subtitle(this.subtitleForProjectsFile(filePath));
       });
     });
   }
 
-  _generateSubtitle(path: string) {
+  private subtitleForProjectsFile(path: string) {
     return _(
       "The extension checks default locations automatically, but you can add a custom one here\n" +
         "Current value: " +

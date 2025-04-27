@@ -72,10 +72,12 @@ export default class EmacsSearchProvider<
     if (this.app) {
       try {
         const fullPath = this._resolveHomePath(path);
-        Gio.Subprocess.new(
-          [this.app?.app_info.get_executable(), "--chdir", fullPath],
-          Gio.SubprocessFlags.NONE,
-        );
+        const commandTemplate =
+          this.extension?._settings?.get_string("emacs-exec") ||
+          "emacs --chdir %D";
+        const command = commandTemplate.replaceAll("%D", fullPath);
+        const argv = ["sh", "-c", command];
+        Gio.Subprocess.new(argv, Gio.SubprocessFlags.NONE);
       } catch (e) {
         console.error(e);
       }
