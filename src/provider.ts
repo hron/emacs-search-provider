@@ -102,9 +102,10 @@ export default class EmacsSearchProvider<
   }
 
   async getSubsearchResultSet(_previousResults: string[], terms: string[]) {
-    const searchTerm = terms.join("").toLowerCase();
-    return this.projects.filter((path) =>
-      path.toLowerCase().includes(searchTerm),
+    return terms.reduce(
+      (result, term) =>
+        result.filter((path) => path.toLowerCase().includes(term)),
+      this.projects,
     );
   }
 
