@@ -101,9 +101,9 @@ export default class EmacsSearchProvider<
     return this.getSubsearchResultSet(this.projects, terms);
   }
 
-  async getSubsearchResultSet(previousResults: string[], terms: string[]) {
+  async getSubsearchResultSet(_previousResults: string[], terms: string[]) {
     const searchTerm = terms.join("").toLowerCase();
-    return previousResults.filter((path) =>
+    return this.projects.filter((path) =>
       path.toLowerCase().includes(searchTerm),
     );
   }
